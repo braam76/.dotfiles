@@ -3,32 +3,14 @@
 {
   home.username = "braam";
   home.homeDirectory = "/home/braam";
+  home.stateVersion = "24.11"; 
 
-  # This value determines the Home Manager release that your configuration is
-  # compatible with. This helps avoid breakage when a new Home Manager release
-  # introduces backwards incompatible changes.
-  #
-  # You should not change this value, even if you update Home Manager. If you do
-  # want to update the value, then make sure to first check the Home Manager
-  # release notes.
-  home.stateVersion = "24.11"; # Please read the comment before changing.
-
-  # The home.packages option allows you to install Nix packages into your
-  # environment.
   home.packages = [
     pkgs.eza
     pkgs.fastfetch
     pkgs.ripgrep
-    
-
     pkgs.nerd-fonts.monofur  
   ];
-
-  # Home Manager is pretty good at managing dotfiles. The primary way to manage
-  # plain files is through 'home.file'.
-  home.file = {
-
-  };
 
   home.sessionVariables = {
     EDITOR = "emacs";
@@ -36,12 +18,26 @@
 
   programs.emacs = {
     enable = true;
-    package = pkgs.emacs;
+    package = with pkgs; (
+      (emacsPackagesFor pkgs.emacs).emacsWithPackages (
+        epkgs: [
+          epkgs.vterm
+	        
+	        epkgs.melpaPackages.company
+
+	        # language modes
+	        epkgs.melpaPackages.nix-mode
+	        epkgs.melpaPackages.go-mode
+	        epkgs.melpaPackages.haskell-mode
+	        
+        ]
+      )
+    );
     extraConfig = ''
-      (setq standart-ident 2)
+      (setq standard-indent 2)
     '';
   };
 
-  # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 }
+  
